@@ -1,0 +1,19 @@
+{
+  "name": "lms-playwright",
+  "version": "1.0.0",
+  "description": "Playwright automation suite for LMS document management",
+  "scripts": {
+    "test": "playwright test",
+    "test:headed": "playwright test --headed",
+    "test:debug": "playwright test --debug",
+    "test:chrome": "playwright test --project=chromium",
+    "test:login": "playwright test tests/login.spec.ts",
+    "report": "playwright show-report",
+    "clean": "rm -rf test-results playwright-report playwright/.auth"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.44.0",
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0"
+  }
+}

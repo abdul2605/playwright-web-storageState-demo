@@ -1,0 +1,17 @@
+# Dependencies
+node_modules/
+
+# Playwright artifacts
+test-results/
+playwright-report/
+playwright/.auth/
+
+# Secrets / local env
+.env
+.env.*
+
+# OS / editor
+.DS_Store
+
+# Debug output
+debug-*.png

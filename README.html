@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>BIS Playwright Automation Suite</title>
+<style>
+  :root {
+    --fg: #1f2328;
+    --muted: #59636e;
+    --border: #d1d9e0;
+    --bg: #ffffff;
+    --code-bg: #f6f8fa;
+    --accent: #0969da;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    color: var(--fg);
+    background: var(--bg);
+    font: 16px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  }
+  .container { max-width: 900px; margin: 0 auto; padding: 40px 24px 80px; }
+  h1, h2, h3 { line-height: 1.25; font-weight: 600; }
+  h1 { font-size: 2em; padding-bottom: .3em; border-bottom: 1px solid var(--border); }
+  h2 { font-size: 1.5em; margin-top: 2em; padding-bottom: .3em; border-bottom: 1px solid var(--border); }
+  h3 { font-size: 1.15em; margin-top: 1.6em; }
+  p, li { color: var(--fg); }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  hr { border: none; border-top: 1px solid var(--border); margin: 2em 0; }
+  code {
+    font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+    font-size: .88em;
+    background: var(--code-bg);
+    padding: .2em .4em;
+    border-radius: 6px;
+  }
+  pre {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px;
+    overflow: auto;
+  }
+  pre code { background: none; padding: 0; font-size: .85em; line-height: 1.5; }
+  table { border-collapse: collapse; width: 100%; margin: 1em 0; display: block; overflow: auto; }
+  th, td { border: 1px solid var(--border); padding: 8px 13px; text-align: left; }
+  th { background: var(--code-bg); font-weight: 600; }
+  blockquote {
+    margin: 1em 0;
+    padding: .4em 1em;
+    color: var(--muted);
+    border-left: .25em solid var(--border);
+  }
+  .comment { color: var(--muted); }
+</style>
+</head>
+<body>
+<div class="container">
+
+<h1>BIS Playwright Automation Suite</h1>
+
+<p>A Playwright + TypeScript automation project using the <strong>Page Object Model (POM)</strong>.
+It automates the <strong>BIS Safety</strong> web app (<code>bissafety.app</code>) — a ColdFusion (<code>.cfm</code>)
+application. The headline scenario opens a folder, adds a document via the
+<strong>Add Document</strong> popup, captures the save response, and verifies the new document.</p>
+
+<hr />
+
+<h2>Quick Start</h2>
+
+<pre><code><span class="comment"># 1. Install dependencies and the Chromium browser</span>
+npm install
+npx playwright install chromium
+
+<span class="comment"># 2. (Optional) point the suite at your environment / credentials</span>
+export LMS_BASE_URL="https://www.bissafety.app/v1/index.cfm?action=home.loginForm"
+export LMS_USERNAME="your-username"
+export LMS_PASSWORD="your-password"
+export LMS_FOLDER_NAME="Test Automation Folder"
+export LMS_DOCUMENT_TITLE="DocInspection"
+
+<span class="comment"># 3. Run the tests (Chromium, headed by default)</span>
+npm test
+
+<span class="comment"># 4. Open the HTML report</span>
+npm run report</code></pre>
+
+<p>The first run logs in once via the <code>setup</code> project and saves the session to
+<code>playwright/.auth/user.json</code>; later runs reuse it. If env vars are omitted, the
+defaults in <a href="utils/env.ts"><code>utils/env.ts</code></a> are used.</p>
+
+<hr />
+
+<h2>Project Structure</h2>
+
+<pre><code>bisAssessment/
+│
+├── pages/                        <span class="comment"># Page Object classes</span>
+│   ├── BasePage.ts               <span class="comment"># Shared utilities (fill, assert, wait, nav)</span>
+│   ├── LoginPage.ts              <span class="comment"># Login form interactions</span>
+│   ├── FoldersPage.ts            <span class="comment"># Folder listing page</span>
+│   ├── AddDocumentPage.ts        <span class="comment"># Add Document form (dynamic sections, upload)</span>
+│   ├── FolderDocumentsPage.ts    <span class="comment"># Document list inside a folder</span>
+│   └── index.ts                  <span class="comment"># Barrel export</span>
+│
+├── fixtures/
+│   ├── index.ts                                          <span class="comment"># Custom Playwright fixtures (injects POMs)</span>
+│   └── Senior QA QC - Skill Assessment 2 - Instructions.pdf  <span class="comment"># Sample file for upload tests</span>
+│
+├── tests/
+│   ├── auth.setup.ts             <span class="comment"># One-time login → saves session to disk</span>
+│   ├── login.spec.ts             <span class="comment"># Login page test</span>
+│   └── addDocument.spec.ts       <span class="comment"># Main E2E test</span>
+│
+├── test-data/
+│   └── documentData.ts           <span class="comment"># Form input values in one place</span>
+│
+├── utils/
+│   ├── env.ts                    <span class="comment"># Environment config / constants</span>
+│   ├── logger.ts                 <span class="comment"># Timestamped console logger</span>
+│   └── apiHelpers.ts             <span class="comment"># Network intercept + response assertion helpers</span>
+│
+├── playwright.config.ts          <span class="comment"># Playwright project config (browsers, auth)</span>
+├── tsconfig.json                 <span class="comment"># TypeScript config</span>
+└── package.json                  <span class="comment"># Scripts + dependencies</span></code></pre>
+
+<hr />
+
+<h2>Setup</h2>
+
+<pre><code><span class="comment"># 1. Install dependencies</span>
+npm install
+
+<span class="comment"># 2. Install browser binaries</span>
+npx playwright install chromium</code></pre>
+
+<p>The upload fixture <code>fixtures/Senior QA QC - Skill Assessment 2 - Instructions.pdf</code>
+is committed. To use a different file, replace it (and update the path in
+<code>tests/addDocument.spec.ts</code>).</p>
+
+<hr />
+
+<h2>Environment Variables</h2>
+
+<p>All config flows through <a href="utils/env.ts"><code>utils/env.ts</code></a> (<code>ENV</code>), which reads env
+vars with built-in fallbacks. Override via env vars rather than editing the file.</p>
+
+<table>
+  <thead>
+    <tr><th>Variable</th><th>Description</th><th>Default</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><code>LMS_BASE_URL</code></td><td>Login URL of the app</td><td><code>https://www.bissafety.app/v1/index.cfm?action=home.loginForm</code></td></tr>
+    <tr><td><code>LMS_USERNAME</code></td><td>Login username</td><td>(set in <code>env.ts</code>)</td></tr>
+    <tr><td><code>LMS_PASSWORD</code></td><td>Login password</td><td>(set in <code>env.ts</code>)</td></tr>
+    <tr><td><code>LMS_FOLDER_NAME</code></td><td>Folder to open</td><td><code>Test Automation Folder</code></td></tr>
+    <tr><td><code>LMS_DOCUMENT_TITLE</code></td><td>Title for the new document</td><td><code>n12222</code></td></tr>
+  </tbody>
+</table>
+
+<blockquote>
+<p>Note: <code>env.ts</code> currently ships with real default credentials. Treat them as
+sensitive — prefer setting env vars over committing changes to those defaults.</p>
+</blockquote>
+
+<p>Set them in your shell or a <code>.env</code> file.</p>
+
+<hr />
+
+<h2>Running Tests</h2>
+
+<pre><code><span class="comment"># Run all tests</span>
+npm test
+
+<span class="comment"># Run on Chromium only</span>
+npm run test:chrome
+
+<span class="comment"># Run only the login test</span>
+npm run test:login
+
+<span class="comment"># Run in headed mode (see the browser)</span>
+npm run test:headed
+
+<span class="comment"># Step-through debug mode</span>
+npm run test:debug
+
+<span class="comment"># Open the HTML report</span>
+npm run report
+
+<span class="comment"># Clean reports / results / saved auth</span>
+npm run clean</code></pre>
+
+<p>Run a single file or a single test by title:</p>
+
+<pre><code>npx playwright test tests/addDocument.spec.ts
+npx playwright test -g "Add Document"</code></pre>
+
+<hr />
+
+<h2>Architecture Decisions</h2>
+
+<h3>Page Object Model</h3>
+<p>Each page/component has its own class extending <code>BasePage</code>. Locators live in the
+Page Objects, not in the tests.</p>
+
+<table>
+  <thead>
+    <tr><th>Class</th><th>Responsibility</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><code>BasePage</code></td><td>Shared helpers: fill, check, wait, assert</td></tr>
+    <tr><td><code>LoginPage</code></td><td>Login form</td></tr>
+    <tr><td><code>FoldersPage</code></td><td>Folder listing + open a folder</td></tr>
+    <tr><td><code>AddDocumentPage</code></td><td>Title, terms, notification alert, file upload, submit</td></tr>
+    <tr><td><code>FolderDocumentsPage</code></td><td>Click Add (+), post-submit URL + document assertions</td></tr>
+  </tbody>
+</table>
+
+<h3>Custom Fixtures</h3>
+<p>Tests import <code>test</code>/<code>expect</code> from <a href="fixtures/index.ts"><code>fixtures/index.ts</code></a>
+instead of <code>@playwright/test</code>. This injects ready-to-use Page Object instances —
+no <code>new</code> calls needed in tests.</p>
+
+<h3>Auth Setup</h3>
+<p><a href="tests/auth.setup.ts"><code>auth.setup.ts</code></a> is a Playwright <code>setup</code> project that logs
+in once and saves the session to <code>playwright/.auth/user.json</code>. The <code>chromium</code>
+project declares <code>setup</code> as a dependency, so tests start pre-authenticated.
+<code>addDocument.spec.ts</code> also re-establishes the session inline (recreating
+cookies/localStorage) as a fallback.</p>
+
+<h3>Add Document opens in a popup</h3>
+<p>Clicking the Add Document trigger opens a <strong>popup window</strong>. The test captures it
+via <code>page.waitForEvent('popup')</code> and drives the form through an
+<code>AddDocumentPage</code> bound to that popup page (not the main page).</p>
+
+<h3>Save response capture</h3>
+<p>The app is ColdFusion, so the save is an HTML form <strong>POST</strong> (often a redirect),
+not a JSON API call. The test registers <code>waitForResponse</code> and clicks Submit
+inside a single <code>Promise.all</code> — so the listener is attached before the click —
+and asserts the status is one of <code>200 / 201 / 302</code>. JSON bodies are parsed only
+when the <code>content-type</code> indicates JSON.</p>
+
+<h3>Test Data / Config Separation</h3>
+<p>Input values such as the document title live in <code>ENV</code> (<a href="utils/env.ts"><code>utils/env.ts</code></a>)
+and <code>test-data/documentData.ts</code>, so updating values for a new environment means
+editing one place.</p>
+
+</div>
+</body>
+</html>
