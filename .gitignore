@@ -12,6 +12,10 @@ playwright/.auth/
 
 # OS / editor
 .DS_Store
+.claude/
 
 # Debug output
 debug-*.png
+
+# Test fixture document (kept locally, not committed)
+fixtures/Senior QA QC - Skill Assessment 2 - Instructions.pdf
